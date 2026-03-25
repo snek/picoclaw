@@ -7,7 +7,6 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-    image: docker.io/sipeed/picoclaw:latest
     container_name: picoclaw-agent
     profiles:
       - agent
@@ -28,7 +27,6 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-    image: docker.io/sipeed/picoclaw:latest
     container_name: picoclaw-gateway
     restart: on-failure
     profiles:
@@ -47,7 +45,6 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile.launcher
-    image: docker.io/sipeed/picoclaw:launcher
     container_name: picoclaw-launcher
     restart: on-failure
     profiles:
