@@ -1,26 +1,5 @@
 # ============================================================
-# Stage 1: Build the frontend
-# ============================================================
-FROM node:24-alpine AS frontend-builder
-
-WORKDIR /src/web/frontend
-
-# Install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
-# Copy only frontend dependencies
-COPY web/frontend/package.json web/frontend/pnpm-lock.yaml* ./
-RUN pnpm install
-
-# Copy all source files
-COPY . /src
-WORKDIR /src/web/frontend
-
-# Build frontend to web/backend/dist
-RUN pnpm build:backend
-
-# ============================================================
-# Stage 2: Build the backend
+# Stage 1: Build the picoclaw binary
 # ============================================================
 FROM golang:1.26.1-alpine AS builder
 
@@ -32,16 +11,12 @@ WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
 
-# Copy source including the built frontend from Stage 1
+# Copy source and build
 COPY . .
-COPY --from=frontend-builder /src/web/backend/dist ./web/backend/dist
-
-# Build the main picoclaw binary and the launcher binary
 RUN make build
-RUN make build-launcher
 
 # ============================================================
-# Stage 3: Full-featured runtime image (Node.js + Python + uv)
+# Stage 2: Node.js-based runtime with full MCP support
 # ============================================================
 FROM node:24-alpine3.23
 
@@ -59,9 +34,8 @@ RUN apk add --no-cache \
 RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/usr/local/bin sh && \
   uv --version
 
-# Copy binaries
+# Copy binary
 COPY --from=builder /src/build/picoclaw /usr/local/bin/picoclaw
-COPY --from=builder /src/build/picoclaw-launcher /usr/local/bin/picoclaw-launcher
 
 # Rename the 'node' user to 'picoclaw' for consistency
 RUN deluser node && \
@@ -79,5 +53,5 @@ WORKDIR /home/picoclaw
 # Create picoclaw home directory structure
 RUN /usr/local/bin/picoclaw onboard
 
-ENTRYPOINT ["/sbin/tini", "-v", "--", "picoclaw-launcher"]
-CMD ["-public", "-no-browser"]
+ENTRYPOINT ["/sbin/tini", "-v", "--", "picoclaw"]
+CMD ["gateway"]
