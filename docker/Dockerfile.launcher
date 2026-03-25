@@ -55,6 +55,10 @@ COPY --from=builder /src/build/picoclaw-launcher /usr/local/bin/picoclaw-launche
 RUN addgroup -g 1000 picoclaw && \
     adduser -D -u 1000 -G picoclaw picoclaw
 
+# Set up home directory with correct permissions
+RUN mkdir -p /home/picoclaw/.picoclaw && \
+    chown -R picoclaw:picoclaw /home/picoclaw
+
 # Switch to non-root user
 USER picoclaw
 WORKDIR /home/picoclaw

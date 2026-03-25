@@ -42,11 +42,15 @@ RUN deluser node && \
     addgroup -g 1000 picoclaw && \
     adduser -D -u 1000 -G picoclaw picoclaw
 
+# Set up home directory and npm cache with correct permissions
+RUN mkdir -p /home/picoclaw/.picoclaw /home/picoclaw/.npm && \
+    chown -R picoclaw:picoclaw /home/picoclaw
+
 # Switch to non-root user
 USER picoclaw
 WORKDIR /home/picoclaw
 
-# Create picoclaw home directory
+# Create picoclaw home directory structure
 RUN /usr/local/bin/picoclaw onboard
 
 ENTRYPOINT ["/sbin/tini", "-v", "--", "picoclaw"]

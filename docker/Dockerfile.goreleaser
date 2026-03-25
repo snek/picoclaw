@@ -13,6 +13,10 @@ COPY docker/entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /entrypoint.sh
 
+# Set up home directory with correct permissions
+RUN mkdir -p /home/picoclaw/.picoclaw && \
+    chown -R picoclaw:picoclaw /home/picoclaw
+
 USER picoclaw
 WORKDIR /home/picoclaw
 

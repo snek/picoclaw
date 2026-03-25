@@ -12,6 +12,10 @@ COPY $TARGETPLATFORM/picoclaw /usr/local/bin/picoclaw
 COPY $TARGETPLATFORM/picoclaw-launcher /usr/local/bin/picoclaw-launcher
 COPY $TARGETPLATFORM/picoclaw-launcher-tui /usr/local/bin/picoclaw-launcher-tui
 
+# Set up home directory with correct permissions
+RUN mkdir -p /home/picoclaw/.picoclaw && \
+    chown -R picoclaw:picoclaw /home/picoclaw
+
 USER picoclaw
 WORKDIR /home/picoclaw
 
