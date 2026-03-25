@@ -26,7 +26,8 @@ RUN apk add --no-cache \
   curl \
   git \
   python3 \
-  py3-pip
+  py3-pip \
+  inetutils-telnet
 
 # Install uv and ensure it's in the system path
 RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/usr/local/bin sh && \

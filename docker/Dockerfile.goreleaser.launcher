@@ -2,7 +2,7 @@ FROM alpine:3.21
 
 ARG TARGETPLATFORM
 
-RUN apk add --no-cache ca-certificates tzdata
+RUN apk add --no-cache ca-certificates tzdata curl inetutils-telnet
 
 # Create non-root user and group
 RUN addgroup -g 1000 picoclaw && \
