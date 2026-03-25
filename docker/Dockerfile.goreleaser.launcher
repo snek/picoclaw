@@ -2,7 +2,7 @@ FROM alpine:3.21
 
 ARG TARGETPLATFORM
 
-RUN apk add --no-cache ca-certificates tzdata curl inetutils-telnet
+RUN apk add --no-cache ca-certificates tzdata curl inetutils-telnet tini
 
 # Create non-root user and group
 RUN addgroup -g 1000 picoclaw && \
@@ -15,5 +15,5 @@ COPY $TARGETPLATFORM/picoclaw-launcher-tui /usr/local/bin/picoclaw-launcher-tui
 USER picoclaw
 WORKDIR /home/picoclaw
 
-ENTRYPOINT ["picoclaw-launcher"]
+ENTRYPOINT ["/sbin/tini", "-v", "--", "picoclaw-launcher"]
 CMD ["-public", "-no-browser"]

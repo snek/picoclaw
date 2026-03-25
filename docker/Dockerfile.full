@@ -27,7 +27,8 @@ RUN apk add --no-cache \
   git \
   python3 \
   py3-pip \
-  inetutils-telnet
+  inetutils-telnet \
+  tini
 
 # Install uv and ensure it's in the system path
 RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/usr/local/bin sh && \
@@ -48,5 +49,5 @@ WORKDIR /home/picoclaw
 # Create picoclaw home directory
 RUN /usr/local/bin/picoclaw onboard
 
-ENTRYPOINT ["picoclaw"]
+ENTRYPOINT ["/sbin/tini", "-v", "--", "picoclaw"]
 CMD ["gateway"]

@@ -20,7 +20,7 @@ RUN make build
 # ============================================================
 FROM alpine:3.23
 
-RUN apk add --no-cache ca-certificates tzdata curl inetutils-telnet
+RUN apk add --no-cache ca-certificates tzdata curl inetutils-telnet tini
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
@@ -40,5 +40,5 @@ WORKDIR /home/picoclaw
 # Run onboard to create initial directories and config
 RUN /usr/local/bin/picoclaw onboard
 
-ENTRYPOINT ["picoclaw"]
+ENTRYPOINT ["/sbin/tini", "-v", "--", "picoclaw"]
 CMD ["gateway"]
