@@ -1,0 +1,63 @@
+# ============================================================
+# Stage 1: Build the frontend
+# ============================================================
+FROM node:24-alpine AS frontend-builder
+
+WORKDIR /src/web/frontend
+
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# Copy only frontend dependencies
+COPY web/frontend/package.json web/frontend/pnpm-lock.yaml* ./
+RUN pnpm install
+
+# Copy all source files
+COPY . /src
+WORKDIR /src/web/frontend
+
+# Build frontend to web/backend/dist
+RUN pnpm build:backend
+
+# ============================================================
+# Stage 2: Build the backend
+# ============================================================
+FROM golang:1.25-alpine AS builder
+
+RUN apk add --no-cache git make
+
+WORKDIR /src
+
+# Cache dependencies
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy source including the built frontend from Stage 1
+COPY . .
+COPY --from=frontend-builder /src/web/backend/dist ./web/backend/dist
+
+# Build the main picoclaw binary and the launcher binary
+RUN make build
+RUN make build-launcher
+
+# ============================================================
+# Stage 3: Minimal runtime image
+# ============================================================
+FROM alpine:3.23
+
+RUN apk add --no-cache ca-certificates tzdata curl
+
+# Copy binaries
+COPY --from=builder /src/build/picoclaw /usr/local/bin/picoclaw
+COPY --from=builder /src/build/picoclaw-launcher /usr/local/bin/picoclaw-launcher
+
+# Create non-root user and group
+RUN addgroup -g 1000 picoclaw && \
+    adduser -D -u 1000 -G picoclaw picoclaw
+
+# Switch to non-root user
+USER picoclaw
+WORKDIR /home/picoclaw
+
+ENTRYPOINT ["picoclaw-launcher"]
+CMD ["-public", "-no-browser"]
