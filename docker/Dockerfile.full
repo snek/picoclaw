@@ -1,7 +1,7 @@
 # ============================================================
 # Stage 1: Build the picoclaw binary
 # ============================================================
-FROM golang:1.26.1-alpine AS builder
+FROM golang:1.26.0-alpine AS builder
 
 RUN apk add --no-cache git make
 
@@ -26,32 +26,19 @@ RUN apk add --no-cache \
   curl \
   git \
   python3 \
-  py3-pip \
-  inetutils-telnet \
-  tini
+  py3-pip
 
-# Install uv and ensure it's in the system path
-RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/usr/local/bin sh && \
+# Install uv and symlink to system path
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
+  ln -s /root/.local/bin/uv /usr/local/bin/uv && \
+  ln -s /root/.local/bin/uvx /usr/local/bin/uvx && \
   uv --version
 
 # Copy binary
 COPY --from=builder /src/build/picoclaw /usr/local/bin/picoclaw
 
-# Rename the 'node' user to 'picoclaw' for consistency
-RUN deluser node && \
-    addgroup -g 1000 picoclaw && \
-    adduser -D -u 1000 -G picoclaw picoclaw
-
-# Set up home directory and npm cache with correct permissions
-RUN mkdir -p /home/picoclaw/.picoclaw /home/picoclaw/.npm && \
-    chown -R picoclaw:picoclaw /home/picoclaw
-
-# Switch to non-root user
-USER picoclaw
-WORKDIR /home/picoclaw
-
-# Create picoclaw home directory structure
+# Create picoclaw home directory
 RUN /usr/local/bin/picoclaw onboard
 
-ENTRYPOINT ["/sbin/tini", "-v", "--", "picoclaw"]
+ENTRYPOINT ["picoclaw"]
 CMD ["gateway"]
