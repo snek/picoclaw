@@ -35,6 +35,7 @@ RUN addgroup -g 1000 picoclaw && \
 
 # Switch to non-root user
 USER picoclaw
+WORKDIR /home/picoclaw
 
 # Run onboard to create initial directories and config
 RUN /usr/local/bin/picoclaw onboard

@@ -11,9 +11,9 @@ services:
     profiles:
       - agent
     volumes:
-      - ../config/config.json:/root/.picoclaw/config.json:ro
-      - picoclaw-workspace:/root/.picoclaw/workspace
-      - picoclaw-npm-cache:/root/.npm # npm cache for faster MCP server installs
+      - ../config/config.json:/home/picoclaw/.picoclaw/config.json:ro
+      - picoclaw-workspace:/home/picoclaw/.picoclaw/workspace
+      - picoclaw-npm-cache:/home/picoclaw/.npm # npm cache for faster MCP server installs
     entrypoint: ["picoclaw", "agent"]
     stdin_open: true
     tty: true
@@ -32,11 +32,11 @@ services:
       - gateway
     volumes:
       # Configuration file
-      - ../config/config.json:/root/.picoclaw/config.json:ro
+      - ../config/config.json:/home/picoclaw/.picoclaw/config.json:ro
       # Persistent workspace (sessions, memory, logs)
-      - picoclaw-workspace:/root/.picoclaw/workspace
+      - picoclaw-workspace:/home/picoclaw/.picoclaw/workspace
       # NPM cache for faster MCP server installs
-      - picoclaw-npm-cache:/root/.npm
+      - picoclaw-npm-cache:/home/picoclaw/.npm
     command: ["gateway"]
 
 volumes:

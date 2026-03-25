@@ -28,14 +28,21 @@ RUN apk add --no-cache \
   python3 \
   py3-pip
 
-# Install uv and symlink to system path
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
-  ln -s /root/.local/bin/uv /usr/local/bin/uv && \
-  ln -s /root/.local/bin/uvx /usr/local/bin/uvx && \
+# Install uv and ensure it's in the system path
+RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/usr/local/bin sh && \
   uv --version
 
 # Copy binary
 COPY --from=builder /src/build/picoclaw /usr/local/bin/picoclaw
+
+# Rename the 'node' user to 'picoclaw' for consistency
+RUN deluser node && \
+    addgroup -g 1000 picoclaw && \
+    adduser -D -u 1000 -G picoclaw picoclaw
+
+# Switch to non-root user
+USER picoclaw
+WORKDIR /home/picoclaw
 
 # Create picoclaw home directory
 RUN /usr/local/bin/picoclaw onboard
