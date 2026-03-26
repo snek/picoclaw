@@ -856,6 +856,9 @@ func LoadConfig(path string) (*Config, error) {
 		return nil, err
 	}
 
+	// Ensure any new default models added to defaults.go are available
+	SyncDefaultModels(cfg)
+
 	if err := resolveAPIKeys(cfg.ModelList, filepath.Dir(path)); err != nil {
 		return nil, err
 	}

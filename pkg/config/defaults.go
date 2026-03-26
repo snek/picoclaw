@@ -315,6 +315,26 @@ func DefaultConfig() *Config {
 				AuthMethod: "oauth",
 			},
 
+			// Google AI Studio (Gemini) - https://aistudio.google.com/
+			{
+				ModelName: "gemini-3-flash",
+				Model:     "google/gemini-3-flash-preview",
+				APIBase:   "https://generativelanguage.googleapis.com/v1beta/openai",
+				APIKey:    "",
+			},
+			{
+				ModelName: "gemini-3.1-flash-lite",
+				Model:     "google/gemini-3.1-flash-lite-preview",
+				APIBase:   "https://generativelanguage.googleapis.com/v1beta/openai",
+				APIKey:    "",
+			},
+			{
+				ModelName: "gemini-3.1-pro",
+				Model:     "google/gemini-3.1-pro-preview",
+				APIBase:   "https://generativelanguage.googleapis.com/v1beta/openai",
+				APIKey:    "",
+			},
+
 			// GitHub Copilot - https://github.com/settings/tokens
 			{
 				ModelName:  "copilot-gpt-5.4",

@@ -468,3 +468,24 @@ func ConvertProvidersToModelList(cfg *Config) []ModelConfig {
 
 	return result
 }
+
+// SyncDefaultModels appends any missing default models to the user's model_list.
+// A model is considered missing if no entry exists with the same ModelName.
+func SyncDefaultModels(cfg *Config) {
+	if cfg == nil {
+		return
+	}
+
+	defaults := DefaultConfig()
+	existingNames := make(map[string]bool)
+	for _, m := range cfg.ModelList {
+		existingNames[m.ModelName] = true
+	}
+
+	for _, dm := range defaults.ModelList {
+		if !existingNames[dm.ModelName] {
+			cfg.ModelList = append(cfg.ModelList, dm)
+		}
+	}
+}
+

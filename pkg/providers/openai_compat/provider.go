@@ -160,6 +160,10 @@ func (p *Provider) Chat(
 	req.Header.Set("Content-Type", "application/json")
 	if p.apiKey != "" {
 		req.Header.Set("Authorization", "Bearer "+p.apiKey)
+		// Google AI Studio OpenAI-compatible endpoint also accepts x-goog-api-key
+		if strings.Contains(p.apiBase, "googleapis.com") {
+			req.Header.Set("x-goog-api-key", p.apiKey)
+		}
 	}
 
 	resp, err := p.httpClient.Do(req)
